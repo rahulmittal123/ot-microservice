@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: empms-db
+spec:
+  selector:
+    matchLabels:
+      app: empms-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: empms-db
+    spec:
+      containers:
+      - image: mysql:5.6
+        name: empms-db
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: password
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: empms-db
+spec:
+  ports:
+  - port: 3306
+    protocol: TCP
+  selector:
+    app: empms-db

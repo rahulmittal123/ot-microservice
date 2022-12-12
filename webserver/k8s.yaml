@@ -1,0 +1,44 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: empms-webserver
+  name: empms-webserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: empms-webserver
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: empms-webserver
+    spec:
+      containers:
+      - image: opstree/empms-webserver:1.0
+        imagePullPolicy: Always
+        name: empms-webserver
+        ports:
+        - containerPort: 80
+        resources: {}
+        env:
+          - name: DEPLOY_TIME
+            value: 22:10
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: empms-webserver
+spec:
+  type: NodePort
+  selector:
+    app: empms-webserver
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+
